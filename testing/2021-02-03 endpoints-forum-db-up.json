@@ -1,0 +1,642 @@
+{
+	"info": {
+		"_postman_id": "92d7ba0a-2df7-4b45-8447-c721de6a62a2",
+		"name": "endpoints-forum-db-up",
+		"description": "Unitests for api-endpoints of playground forum backend.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "add-user - localhost:3000/users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6ce97096-7273-4f07-894c-a9c30a4bce9d",
+						"exec": [
+							"pm.test(\"POST /users - status\", () => {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"const res = pm.response.json();",
+							"pm.environment.set(\"user_6_id\", res[0].id);",
+							"pm.test(\"POST /users - response\", () => {",
+							"  pm.expect(res[0].username).to.eql(pm.environment.get(\"user_6_username\"));",
+							"  pm.expect(res[0].firstname).to.eql(pm.environment.get(\"user_6_firstname\"));",
+							"  pm.expect(res[0].lastname).to.eql(pm.environment.get(\"user_6_lastname\"));",
+							"  pm.expect(res[0].avatar).to.eql(pm.environment.get(\"user_6_avatar\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "b475d481-52f0-4ca4-a2b2-2ff78574200c",
+						"exec": [
+							"username6 = pm.environment.get(\"user_6_username\");",
+							"",
+							"const getreq = {",
+							"    url: `http://localhost:3000/users?mail=${username6}`,",
+							"    method: \"GET\"",
+							"}",
+							"",
+							"pm.sendRequest(getreq, (geterr, getres) => {",
+							"    if (geterr) {",
+							"        console.log(`Error of get request: ${geterr}`);",
+							"    } else {",
+							"        if (getres.json()[0] && getres.json()[0].id) {",
+							"            const id = getres.json()[0].id;",
+							"            const req = {",
+							"                url: `localhost: 3000/users/${id}`,",
+							"                method: \"DELETE\",",
+							"            };",
+							"            pm.sendRequest(req, (delerr, delres) => {",
+							"                if (delerr) {",
+							"                    console.log(`Error of delete request: ${delerr}`);",
+							"                }",
+							"            });",
+							"        }",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"{{user_6_username}}\",\n    \"pwd\": \"{{user_6_pwd}}\",\n    \"firstname\": \"{{user_6_firstname}}\",\n    \"lastname\": \"{{user_6_lastname}}\",\n    \"avatar\": \"{{user_6_avatar}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/users",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add-existing-user - localhost:3000/users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0cb73b3f-15a2-4cef-82be-ed8b9ed4c5f5",
+						"exec": [
+							"pm.test(\"POST /users - user exists - status\", () => {",
+							"    pm.response.to.have.status(409);",
+							"});",
+							"",
+							"const res = pm.response.json();",
+							"pm.test(\"POST /users - user exitst -  response\", () => {",
+							"  pm.expect(res.errorMessage).to.eql(pm.environment.get(\"signup_fail\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"{{user_6_username}}\",\n    \"pwd\": \"{{user_6_pwd}}\",\n    \"firstname\": \"{{user_6_firstname}}\",\n    \"lastname\": \"{{user_6_lastname}}\",\n    \"avatar\": \"{{user_6_avatar}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/users",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delte-existing-user localhost:3000/users",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "517c1f37-c3ee-4fd3-9be3-fe5bd82dcf46",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "3880da5e-3066-4218-b84d-583befa53713",
+						"exec": [
+							"pm.test(\"Delete /users - status\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const res = pm.response.json();",
+							"pm.test(\"DELETE /users - response\", () => {",
+							"  pm.expect(res.usersDeleted).to.eql(1);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/users/{{user_6_id}}",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users",
+						"{{user_6_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delte-nonexisting-user localhost:3000/users",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "86985ffc-3b3c-47b0-9e2c-1202dfe808a6",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "68ca992b-6b85-4a46-9d3f-b8d2e18f1643",
+						"exec": [
+							"pm.test(\"Delete /users - status\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const res = pm.response.json();",
+							"pm.test(\"DELETE /users - response\", () => {",
+							"  pm.expect(res.usersDeleted).to.eql(0);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/users/{{user_6_id}}",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users",
+						"{{user_6_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login - localhost:3000/login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0063e991-f2ce-42f3-8d03-30843d3b13ca",
+						"exec": [
+							"pm.test(\"GET /login - status\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const res = pm.response.json();",
+							"pm.test(\"GET /login - response\", () => {",
+							"  pm.expect(res.jwt).not.empty;",
+							"  pm.expect(res.username).to.eql(pm.environment.get(\"user_3_username\"));",
+							"  pm.expect(res.firstname).to.eql(pm.environment.get(\"user_3_firstname\"));",
+							"  pm.expect(res.lastname).to.eql(pm.environment.get(\"user_3_lastname\"));",
+							"  pm.expect(res.avatar).to.eql(pm.environment.get(\"user_3_avatar\"));",
+							"});",
+							"pm.environment.set(\"user_3_jwt\", res.jwt);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"{{user_3_username}}\",\n    \"pwd\": \"{{user_3_pwd}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/login",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get-users-by-ids - localhost:3000/users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8f4f6542-a9fe-450b-b1df-0f71d81ca9d0",
+						"exec": [
+							"pm.test(\"GET /users - by ids - status\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const res = pm.response.json();",
+							"const user3 = res.find(item => item.username == pm.environment.get(\"user_3_username\"));",
+							"const user5 = res.find(item => item.username == pm.environment.get(\"user_5_username\"));",
+							"pm.test(\"GET /users - by ids - response\", () => {",
+							"  pm.expect(user3.username).to.eql(pm.environment.get(\"user_3_username\"));",
+							"  pm.expect(user3.firstname).to.eql(pm.environment.get(\"user_3_firstname\"));",
+							"  pm.expect(user3.lastname).to.eql(pm.environment.get(\"user_3_lastname\"));",
+							"  pm.expect(user3.avatar).to.eql(pm.environment.get(\"user_3_avatar\"));",
+							"  pm.expect(user5.username).to.eql(pm.environment.get(\"user_5_username\"));",
+							"  pm.expect(user5.firstname).to.eql(pm.environment.get(\"user_5_firstname\"));",
+							"  pm.expect(user5.lastname).to.eql(pm.environment.get(\"user_5_lastname\"));",
+							"  pm.expect(user5.avatar).to.eql(pm.environment.get(\"user_5_avatar\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"type": "text",
+						"value": "",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/users/3,5",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users",
+						"3,5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get-users-by-invalid-id - localhost:3000/users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6b507a0e-0b4b-4157-a3b9-9f822d5b1cb0",
+						"exec": [
+							"pm.test(\"GET /users - by nvalid id - status\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const res = pm.response.json();",
+							"pm.test(\"GET /users - by invalid ids - response\", () => {",
+							"  pm.expect(res).to.be.empty;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"type": "text",
+						"value": "",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/users/0",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users",
+						"0"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "filter-users-by-unkown-column - localhost:3000/users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bdda45be-6e7a-4515-9ef8-91b64a667702",
+						"exec": [
+							"pm.test(\"GET /users - filter by invalid column name - status\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const res = pm.response.json();",
+							"pm.test(\"GET /users - filter invalid column name - response\", () => {",
+							"  pm.expect(res).to.be.empty;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"type": "text",
+						"value": "",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/users?rubish={{user_1_firstname}}",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users"
+					],
+					"query": [
+						{
+							"key": "rubish",
+							"value": "{{user_1_firstname}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "filter-valid-user - localhost:3000/users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "52ca2cdb-6352-4e2d-be0e-50c6fdfbdf31",
+						"exec": [
+							"pm.test(\"GET /users - filter valid user - status\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const res = pm.response.json();",
+							"const user1 = res.find(item => item.username == \"gbo@oonet.com\");",
+							"pm.test(\"GET /users - filter valid user - response\", () => {",
+							"  //pm.expect(user1.username).to.eql(pm.environment.get(\"user_1_username\"));",
+							"  pm.expect(user1.firstname).to.eql(pm.environment.get(\"user_1_firstname\"));",
+							"  pm.expect(user1.lastname).to.eql(pm.environment.get(\"user_1_lastname\"));",
+							"  pm.expect(user1.avatar).to.eql(pm.environment.get(\"user_1_avatar\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"type": "text",
+						"value": "",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/users?firstname={{user_1_firstname}}&lastname={{user_1_lastname}}",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users"
+					],
+					"query": [
+						{
+							"key": "firstname",
+							"value": "{{user_1_firstname}}"
+						},
+						{
+							"key": "lastname",
+							"value": "{{user_1_lastname}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get-posts-by-ids - localhost:3000/posts",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "16cc2190-ba24-4341-ae20-3eff8e037bd4",
+						"exec": [
+							"pm.test(\"GET /posts - by ids - status\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const res = pm.response.json();",
+							"const post4 = res.find(item => item.id == 4);",
+							"console.log(\"post4: \" + JSON.stringify(post4));",
+							"const post9 = res.find(item => item.id == 9);",
+							"pm.test(\"GET /posts - by ids - response\", () => {",
+							"  pm.expect(post4.posting_timestamp).to.eql(pm.environment.get(\"post_4_timestamp\"));",
+							"  pm.expect(post4.content).to.eql(pm.environment.get(\"post_4_content\"));",
+							"  pm.expect(post9.posting_timestamp).to.eql(pm.environment.get(\"post_9_timestamp\"));",
+							"  pm.expect(post9.content).to.eql(pm.environment.get(\"post_9_content\"));",
+							"",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_3_jwt}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"type": "text",
+						"value": "",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/posts/4,9",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"posts",
+						"4,9"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
